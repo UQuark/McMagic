@@ -2,19 +2,13 @@ package me.uquark.mcmagic.spell;
 
 import me.uquark.mcmagic.entity.SpellEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
 
 public abstract class Spell {
-    public final double x, y, z;
-
-    protected Spell(double x, double y, double z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
-    public double getCost() {
-        return Math.sqrt(x*x+y*y+z*z);
-    }
-
     public abstract SpellEntity<? extends Spell> cast(LivingEntity caster);
+
+    public abstract void onEntityHit(SpellEntity<? extends Spell> spellEntity, EntityHitResult entityHitResult);
+    public abstract void onBlockHit(SpellEntity<? extends Spell> spellEntity, BlockHitResult blockHitResult);
+    public abstract void onHit(SpellEntity<? extends Spell> spellEntity, LivingEntity target);
 }

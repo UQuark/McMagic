@@ -1,7 +1,7 @@
 package me.uquark.mcmagic.item;
 
 import me.uquark.mcmagic.Util;
-import me.uquark.mcmagic.entity.BasicSpellEntity;
+import me.uquark.mcmagic.spell.BasicSpell;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.entity.LivingEntity;
@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 
 public class WandItem extends RangedWeaponItem {
     public static final Identifier ID = new Identifier(Util.MOD_ID, "wand");
-    public static final WandItem ITEM = new WandItem();
+    public static final WandItem INSTANCE = new WandItem();
 
     public WandItem() {
         super(new FabricItemSettings().group(ItemGroup.TOOLS).fireproof().maxCount(1));
@@ -44,13 +44,13 @@ public class WandItem extends RangedWeaponItem {
 
     @Override
     public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-        user.swingHand(user.getActiveHand());
-        world.spawnEntity(new BasicSpellEntity(user));
+        if (BasicSpell.INSTANCE.cast(user) != null)
+            user.swingHand(user.getActiveHand());
     }
 
     public static void register() {
-        Registry.register(Registry.ITEM, ID, ITEM);
-        ModelPredicateProviderRegistry.register(ITEM, new Identifier("aiming"), (stack, world, entity, seed) -> {
+        Registry.register(Registry.ITEM, ID, INSTANCE);
+        ModelPredicateProviderRegistry.register(INSTANCE, new Identifier("aiming"), (stack, world, entity, seed) -> {
             if (entity == null) {
                 return 0.0F;
             }
