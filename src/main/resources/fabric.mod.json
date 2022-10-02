@@ -19,6 +19,9 @@
   "entrypoints": {
     "main": [
       "me.uquark.mcmagic.Initializer"
+    ],
+    "client": [
+      "me.uquark.mcmagic.ClientInitializer"
     ]
   },
   "mixins": [

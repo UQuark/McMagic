@@ -1,0 +1,6 @@
+{
+  "parent": "mcmagic:item/wand",
+  "textures": {
+    "layer0": "mcmagic:item/wand_active"
+  }
+}
