@@ -1,7 +1,8 @@
 package me.uquark.mcmagic.item;
 
 import me.uquark.mcmagic.Util;
-import me.uquark.mcmagic.spell.BasicSpell;
+import me.uquark.mcmagic.voice.recognize.Recognizer;
+import me.uquark.mcmagic.voice.record.Recorder;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.entity.LivingEntity;
@@ -37,6 +38,9 @@ public class WandItem extends RangedWeaponItem {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        if (world.isClient) {
+            Recognizer.getInstance().start(Recorder.getInstance().getLine());
+        }
         ItemStack itemStack = user.getStackInHand(hand);
         user.setCurrentHand(hand);
         return TypedActionResult.pass(itemStack);
@@ -44,8 +48,9 @@ public class WandItem extends RangedWeaponItem {
 
     @Override
     public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-        if (BasicSpell.INSTANCE.cast(user) != null)
-            user.swingHand(user.getActiveHand());
+        if (world.isClient) {
+            Recognizer.getInstance().end();
+        }
     }
 
     public static void register() {

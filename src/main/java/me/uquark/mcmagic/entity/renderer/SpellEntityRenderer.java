@@ -7,7 +7,7 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.Identifier;
 
-public class SpellEntityRenderer<T extends SpellEntity<?>> extends EntityRenderer<T> {
+public class SpellEntityRenderer<T extends SpellEntity> extends EntityRenderer<T> {
     public SpellEntityRenderer(EntityRendererFactory.Context ctx) {
         super(ctx);
     }
@@ -17,7 +17,7 @@ public class SpellEntityRenderer<T extends SpellEntity<?>> extends EntityRendere
         return null;
     }
 
-    public static <T extends SpellEntity<?>> void register(EntityType<T> entityType, EntityRendererFactory<T> factory) {
+    public static <T extends SpellEntity> void register(EntityType<T> entityType, EntityRendererFactory<T> factory) {
         EntityRendererRegistry.register(entityType, factory);
     }
 }

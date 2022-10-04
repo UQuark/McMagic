@@ -12,19 +12,20 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
 
 public class BasicSpell extends Spell {
-    public static EntityType<SpellEntity<BasicSpell>> ENTITY_TYPE;
+    public static final Identifier ID = new Identifier(Util.MOD_ID, "basic_spell");
+    public static EntityType<SpellEntity> ENTITY_TYPE;
     public static BasicSpell INSTANCE;
 
     @Override
-    public SpellEntity<BasicSpell> cast(LivingEntity caster) {
-        SpellEntity<BasicSpell> entity = new SpellEntity<>(this, caster, ENTITY_TYPE);
+    public SpellEntity cast(LivingEntity caster) {
+        SpellEntity entity = new SpellEntity(this, caster, ENTITY_TYPE);
         caster.world.spawnEntity(entity);
         return entity;
     }
 
     public static void register() {
         ENTITY_TYPE = SpellEntity.register(
-                new Identifier(Util.MOD_ID, "basic_spell"),
+                ID,
                 SpellEntity::new
         );
         INSTANCE = new BasicSpell();
@@ -35,7 +36,7 @@ public class BasicSpell extends Spell {
     }
 
     @Override
-    public void onEntityHit(SpellEntity<? extends Spell> spellEntity, EntityHitResult entityHitResult) {
+    public void onEntityHit(SpellEntity spellEntity, EntityHitResult entityHitResult) {
         Entity entity = entityHitResult.getEntity();
         if (entity == null)
             return;
@@ -44,12 +45,17 @@ public class BasicSpell extends Spell {
     }
 
     @Override
-    public void onBlockHit(SpellEntity<? extends Spell> spellEntity, BlockHitResult blockHitResult) {
+    public void onBlockHit(SpellEntity spellEntity, BlockHitResult blockHitResult) {
 
     }
 
     @Override
-    public void onHit(SpellEntity<? extends Spell> spellEntity, LivingEntity target) {
+    public void onHit(SpellEntity spellEntity, LivingEntity target) {
 
+    }
+
+    @Override
+    public Identifier getId() {
+        return ID;
     }
 }

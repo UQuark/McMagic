@@ -8,6 +8,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -15,17 +16,17 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
-public class SpellEntity<T extends Spell> extends PersistentProjectileEntity {
+public class SpellEntity extends PersistentProjectileEntity {
     public static final double SPELL_VELOCITY = 1;
-    public T spell;
+    public Spell spell;
 
     protected LivingEntity caster;
-    public SpellEntity(EntityType<? extends SpellEntity<T>> entityType, World world) {
+    public SpellEntity(EntityType<? extends SpellEntity> entityType, World world) {
         super(entityType, world);
         setNoGravity(true);
     }
 
-    public SpellEntity(T spell, LivingEntity caster, EntityType<? extends SpellEntity<T>> entityType) {
+    public SpellEntity(Spell spell, LivingEntity caster, EntityType<? extends SpellEntity> entityType) {
         this(entityType, caster.world);
 
         final double SAFETY_MARGIN = 2;
@@ -50,21 +51,21 @@ public class SpellEntity<T extends Spell> extends PersistentProjectileEntity {
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
-        if (!world.isClient)
+        if (!world.isClient && spell != null)
             spell.onEntityHit(this, entityHitResult);
         discard();
     }
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        if (!world.isClient)
+        if (!world.isClient && spell != null)
             spell.onBlockHit(this, blockHitResult);
         discard();
     }
 
     @Override
     protected void onHit(LivingEntity target) {
-        if (!world.isClient)
+        if (!world.isClient && spell != null)
             spell.onHit(this, target);
         discard();
     }
@@ -79,7 +80,7 @@ public class SpellEntity<T extends Spell> extends PersistentProjectileEntity {
         return ItemStack.EMPTY;
     }
 
-    public static <T extends SpellEntity<?>> EntityType<T> register(Identifier id, EntityType.EntityFactory<T> factory) {
+    public static <T extends SpellEntity> EntityType<T> register(Identifier id, EntityType.EntityFactory<T> factory) {
         return Registry.register(
                 Registry.ENTITY_TYPE,
                 id,
@@ -88,5 +89,19 @@ public class SpellEntity<T extends Spell> extends PersistentProjectileEntity {
                         .dimensions(EntityDimensions.fixed(0.1f, 0.1f))
                         .build()
         );
+    }
+
+    @Override
+    public void writeCustomDataToNbt(NbtCompound nbt) {
+        super.writeCustomDataToNbt(nbt);
+        if (!world.isClient && this.spell != null)
+            nbt.putString("spell", spell.getId().toString());
+    }
+
+    @Override
+    public void readCustomDataFromNbt(NbtCompound nbt) {
+        super.readCustomDataFromNbt(nbt);
+        if (!world.isClient)
+            spell = Spell.get(new Identifier(nbt.getString("spell")));
     }
 }
