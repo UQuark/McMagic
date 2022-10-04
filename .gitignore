@@ -31,3 +31,5 @@ bin/
 # fabric
 
 run/
+
+src/main/java/me/uquark/mcmagic/voice/recognize/ps4j/PS4J.class
