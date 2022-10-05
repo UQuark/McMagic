@@ -2,31 +2,23 @@ package me.uquark.mcmagic.spell;
 
 import me.uquark.mcmagic.Util;
 import me.uquark.mcmagic.entity.SpellEntity;
-import me.uquark.mcmagic.entity.renderer.SpellEntityRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 
 public class TreatmentSpell extends Spell {
-    public static final Identifier ID = new Identifier(Util.MOD_ID, "treatment_spell");
     private static final float POWER = 7;
-    public static EntityType<SpellEntity> ENTITY_TYPE;
     public static TreatmentSpell INSTANCE;
 
-    public static void register() {
-        ENTITY_TYPE = SpellEntity.register(
-                ID,
-                SpellEntity::new
-        );
-        INSTANCE = new TreatmentSpell();
-        Spell.register(ID, INSTANCE);
+    protected TreatmentSpell() {
+        super(new Identifier(Util.MOD_ID, "treatment_spell"));
     }
 
-    public static void registerClient() {
-        SpellEntityRenderer.register(ENTITY_TYPE, SpellEntityRenderer::new);
+    public static TreatmentSpell getInstance() {
+        if (INSTANCE == null)
+            INSTANCE = new TreatmentSpell();
+        return INSTANCE;
     }
 
     @Override
@@ -44,20 +36,5 @@ public class TreatmentSpell extends Spell {
         if (!(entity instanceof LivingEntity))
             return;
         ((LivingEntity) entity).heal(POWER);
-    }
-
-    @Override
-    public void onBlockHit(SpellEntity spellEntity, BlockHitResult blockHitResult) {
-
-    }
-
-    @Override
-    public void onHit(SpellEntity spellEntity, LivingEntity target) {
-
-    }
-
-    @Override
-    public Identifier getId() {
-        return ID;
     }
 }

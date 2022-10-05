@@ -1,6 +1,5 @@
 package me.uquark.mcmagic;
 
-import me.uquark.mcmagic.spell.*;
 import me.uquark.mcmagic.voice.recognize.Recognizer;
 import net.fabricmc.api.ClientModInitializer;
 
@@ -14,16 +13,5 @@ public class ClientInitializer implements ClientModInitializer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        PushSpell.registerClient();
-        PullSpell.registerClient();
-        IgnitionSpell.registerClient();
-        ExplosionSpell.registerClient();
-        HarmSpell.registerClient();
-        TeleportSpell.registerClient();
-        LightningSpell.registerClient();
-        SedationSpell.registerClient();
-        TreatmentSpell.registerClient();
-        IlluminationSpell.registerClient();
     }
 }

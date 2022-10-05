@@ -100,7 +100,7 @@ public class SpellEntity extends PersistentProjectileEntity {
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         if (!world.isClient && this.spell != null)
-            nbt.putString("spell", spell.getId().toString());
+            nbt.putString("spell", spell.ID.toString());
     }
 
     @Override

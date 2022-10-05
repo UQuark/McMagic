@@ -2,10 +2,7 @@ package me.uquark.mcmagic.spell;
 
 import me.uquark.mcmagic.Util;
 import me.uquark.mcmagic.entity.SpellEntity;
-import me.uquark.mcmagic.entity.renderer.SpellEntityRenderer;
 import net.minecraft.block.*;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
@@ -14,34 +11,23 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class IgnitionSpell extends Spell {
-    public static final Identifier ID = new Identifier(Util.MOD_ID, "ignition_spell");
-    public static EntityType<SpellEntity> ENTITY_TYPE;
-    public static IgnitionSpell INSTANCE;
+    private static final int FIRE_DURATION = 10;
+    private static IgnitionSpell INSTANCE;
 
-    public static void register() {
-        ENTITY_TYPE = SpellEntity.register(
-                ID,
-                SpellEntity::new
-        );
-        INSTANCE = new IgnitionSpell();
-        Spell.register(ID, INSTANCE);
+    protected IgnitionSpell() {
+        super(new Identifier(Util.MOD_ID, "ignition_spell"));
     }
 
-    public static void registerClient() {
-        SpellEntityRenderer.register(ENTITY_TYPE, SpellEntityRenderer::new);
-    }
-
-    @Override
-    public SpellEntity cast(LivingEntity caster) {
-        SpellEntity entity = new SpellEntity(this, caster, ENTITY_TYPE);
-        caster.world.spawnEntity(entity);
-        return entity;
+    public static IgnitionSpell getInstance() {
+        if (INSTANCE == null)
+            INSTANCE = new IgnitionSpell();
+        return INSTANCE;
     }
 
     @Override
     public void onEntityHit(SpellEntity spellEntity, EntityHitResult entityHitResult) {
         if (entityHitResult.getEntity() != null)
-            entityHitResult.getEntity().setOnFireFor(10);
+            entityHitResult.getEntity().setOnFireFor(FIRE_DURATION);
     }
 
     @Override
@@ -58,15 +44,5 @@ public class IgnitionSpell extends Spell {
             BlockState blockState2 = AbstractFireBlock.getState(world, blockPos2);
             world.setBlockState(blockPos2, blockState2, Block.NOTIFY_ALL | Block.REDRAW_ON_MAIN_THREAD);
         }
-    }
-
-    @Override
-    public void onHit(SpellEntity spellEntity, LivingEntity target) {
-
-    }
-
-    @Override
-    public Identifier getId() {
-        return ID;
     }
 }

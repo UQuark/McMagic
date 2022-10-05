@@ -9,15 +9,15 @@ public class Initializer implements ModInitializer {
     public void onInitialize() {
         WandItem.register();
 
-        IgnitionSpell.register();
-        PushSpell.register();
-        PullSpell.register();
-        ExplosionSpell.register();
-        HarmSpell.register();
-        TeleportSpell.register();
-        LightningSpell.register();
-        SedationSpell.register();
-        TreatmentSpell.register();
-        IlluminationSpell.register();
+        IgnitionSpell.getInstance();
+        PushSpell.getInstance();
+        PullSpell.getInstance();
+        ExplosionSpell.getInstance();
+        HarmSpell.getInstance();
+        TeleportSpell.getInstance();
+        LightningSpell.getInstance();
+        SedationSpell.getInstance();
+        TreatmentSpell.getInstance();
+        IlluminationSpell.getInstance();
     }
 }
