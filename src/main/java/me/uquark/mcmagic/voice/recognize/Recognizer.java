@@ -12,15 +12,35 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Recognizer {
     private static final int BUFFER_SIZE = 4096;
     private static final long HYPOTHESIS_INTERVAL = 200;
-    private static final long RECOGNITION_INTERVAL = 50;
-    private static final long END_UTTERANCE_DELAY = 400;
     private static Recognizer INSTANCE;
+    private final ArrayList<HypothesisListener> listeners = new ArrayList<>();
+    private String lastHypothesis = "";
+    private UtteranceThread utteranceThread;
+
+    private Recognizer() {
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (utteranceThread == null || !utteranceThread.running)
+                    return;
+                String hypothesis = PS4J.getHypothesis();
+                if (hypothesis != null && !hypothesis.equals(lastHypothesis)) {
+                    lastHypothesis = hypothesis;
+                    for (HypothesisListener listener : listeners) {
+                        listener.onHypothesis(hypothesis, PS4J.getScore());
+                    }
+                }
+            }
+        }, HYPOTHESIS_INTERVAL / 2, HYPOTHESIS_INTERVAL);
+    }
+
     public static Recognizer getInstance() {
         if (INSTANCE == null)
             INSTANCE = new Recognizer();
@@ -57,8 +77,32 @@ public class Recognizer {
         PS4J.init(model.toString(), dict.toString(), kws.toString());
     }
 
-    private String lastHypothesis = "";
-    private UtteranceThread utteranceThread;
+    public void addHypothesisListener(HypothesisListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeHypothesisListener(HypothesisListener listener) {
+        listeners.remove(listener);
+    }
+
+    public void start(TargetDataLine line) {
+        if (utteranceThread != null)
+            return;
+        lastHypothesis = "";
+        utteranceThread = new UtteranceThread();
+        utteranceThread.start(line);
+    }
+
+    public void end() {
+        if (utteranceThread == null)
+            return;
+        utteranceThread.interrupt();
+        utteranceThread = null;
+    }
+
+    public interface HypothesisListener {
+        void onHypothesis(String hypothesis, int score);
+    }
 
     private static class UtteranceThread extends Thread {
         private TargetDataLine line;
@@ -79,6 +123,7 @@ public class Recognizer {
             int res = PS4J.startUtterance();
             assert res == 0;
 
+            line.flush();
             while (running) {
                 int read = line.read(buffer, 0, BUFFER_SIZE);
                 if (read > 0) {
@@ -97,32 +142,5 @@ public class Recognizer {
             running = false;
             super.interrupt();
         }
-    }
-
-    private Recognizer() {
-        new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                String hypothesis = PS4J.getHypothesis();
-                if (hypothesis != null && !hypothesis.equals(lastHypothesis)) {
-                    lastHypothesis = hypothesis;
-                    System.out.println(hypothesis);
-                    System.out.flush();
-                }
-            }
-        }, HYPOTHESIS_INTERVAL / 2, HYPOTHESIS_INTERVAL);
-    }
-
-    public void start(TargetDataLine line) {
-        if (utteranceThread != null)
-            return;
-        lastHypothesis = "";
-        utteranceThread = new UtteranceThread();
-        utteranceThread.start(line);
-    }
-
-    public void end() {
-        utteranceThread.interrupt();
-        utteranceThread = null;
     }
 }

@@ -12,12 +12,12 @@ public class SpellEntityRenderer<T extends SpellEntity> extends EntityRenderer<T
         super(ctx);
     }
 
+    public static <T extends SpellEntity> void register(EntityType<T> entityType, EntityRendererFactory<T> factory) {
+        EntityRendererRegistry.register(entityType, factory);
+    }
+
     @Override
     public Identifier getTexture(T entity) {
         return null;
-    }
-
-    public static <T extends SpellEntity> void register(EntityType<T> entityType, EntityRendererFactory<T> factory) {
-        EntityRendererRegistry.register(entityType, factory);
     }
 }

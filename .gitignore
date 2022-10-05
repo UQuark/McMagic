@@ -33,3 +33,5 @@ bin/
 run/
 
 src/main/java/me/uquark/mcmagic/voice/recognize/ps4j/PS4J.class
+
+src/main/resources/assets/mcmagic/ps4j.tar

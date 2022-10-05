@@ -17,10 +17,11 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public class SpellEntity extends PersistentProjectileEntity {
-    public static final double SPELL_VELOCITY = 1;
+    public static final double SPELL_VELOCITY = 5;
     public Spell spell;
 
     protected LivingEntity caster;
+
     public SpellEntity(EntityType<? extends SpellEntity> entityType, World world) {
         super(entityType, world);
         setNoGravity(true);
@@ -34,12 +35,27 @@ public class SpellEntity extends PersistentProjectileEntity {
         this.caster = caster;
         this.spell = spell;
 
-        Vec3d launchPos = new Vec3d(caster.getX(), caster.getEyeY() - (double)0.1f, caster.getZ());
+        Vec3d launchPos = new Vec3d(caster.getX(), caster.getEyeY() - (double) 0.1f, caster.getZ());
         launchPos.add(caster.getVelocity().multiply(SAFETY_MARGIN));
 
         setPosition(launchPos);
         setRotation(caster.getHeadYaw(), caster.getPitch());
         setVelocity(caster.getRotationVector().multiply(SPELL_VELOCITY));
+    }
+
+    public static <T extends SpellEntity> EntityType<T> register(Identifier id, EntityType.EntityFactory<T> factory) {
+        return Registry.register(
+                Registry.ENTITY_TYPE,
+                id,
+                FabricEntityTypeBuilder
+                        .create(SpawnGroup.MISC, factory)
+                        .dimensions(EntityDimensions.fixed(0.1f, 0.1f))
+                        .build()
+        );
+    }
+
+    public LivingEntity getCaster() {
+        return caster;
     }
 
     @Override
@@ -80,17 +96,6 @@ public class SpellEntity extends PersistentProjectileEntity {
         return ItemStack.EMPTY;
     }
 
-    public static <T extends SpellEntity> EntityType<T> register(Identifier id, EntityType.EntityFactory<T> factory) {
-        return Registry.register(
-                Registry.ENTITY_TYPE,
-                id,
-                FabricEntityTypeBuilder
-                        .create(SpawnGroup.MISC, factory)
-                        .dimensions(EntityDimensions.fixed(0.1f, 0.1f))
-                        .build()
-        );
-    }
-
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
@@ -103,5 +108,10 @@ public class SpellEntity extends PersistentProjectileEntity {
         super.readCustomDataFromNbt(nbt);
         if (!world.isClient)
             spell = Spell.get(new Identifier(nbt.getString("spell")));
+    }
+
+    @Override
+    public boolean isOnFire() {
+        return true;
     }
 }
